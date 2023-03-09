@@ -85,20 +85,26 @@ public class CPU {
         }
         return ret;
     }
-    public void printStats(){
+
+    public HashMap<String, Double> generateStats(){
+        HashMap<String, Double> statsMap= new HashMap<>();
         int actP=countActiveProcesses();
         int finP= finishedProc.size();
         int allP=actP+finP;
-        System.out.println("Number of processes: "+allP);
-        System.out.println("Active processes: "+ actP);
-        System.out.println("By queues");
+        statsMap.put("All processes", (double) allP);
+        statsMap.put("Finished processes", (double) finP);
+        statsMap.put("Active processes", (double) actP);
+        statsMap.put("", 0.0);
 
         MyQueue tmp;
         for(int i=0; i<queues.size(); i++){
             tmp=queues.get(i);
-            System.out.println(tmp.name+": "+tmp.processes.size());
+            statsMap.put(tmp.name, (double) tmp.processes.size());
         }
-        System.out.println();
-        System.out.println("Finished processes: "+ finP);
+        return statsMap;
+    }
+
+    public boolean computingEnded(){
+        return (countActiveProcesses()==0);
     }
 }
