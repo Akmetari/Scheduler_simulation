@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 public class CPU {
     ArrayList<MyProcess> finishedProc;
@@ -19,26 +16,6 @@ public class CPU {
         assignProcesses(allProc);
     }
 
-    public static CPU start(int numberOfProcesses, boolean myArchitecture){
-        ArrayList<MyProcess> generatedProcesses= CPU.generateRandomListOfProcesses(numberOfProcesses);
-        CPU ret= new CPU();
-        if (myArchitecture){
-            HashSet<MyProcess> tmp= new HashSet<>();
-            tmp.add(new SysProcess());
-            ret.queues.add(new MyQueue("Sys queue",0,new ArrayList<MyProcess>(),tmp));
-            tmp.removeAll(tmp);
-            tmp.add(new RTProcess());
-            ret.queues.add(new MyQueue("RT queue", 0,new ArrayList<MyProcess>(),tmp));
-            tmp.removeAll(tmp);
-            tmp.add(new MyProcess());
-            ret.queues.add(new MyQueue("W queue",0,new ArrayList<MyProcess>(),tmp));
-        }
-        else{ret.queues.add(new MyQueue("Simple queue"));}
-        ret.assignProcesses(generatedProcesses);
-
-        return ret;
-    }
-
     public void assignProcessToQueue(MyProcess p){
        for(MyQueue q: queues)
            if (q.canBeAssigned(p)) {
@@ -50,13 +27,21 @@ public class CPU {
         for(MyProcess p: proc) assignProcessToQueue(p);
     }
     public void cleanProcesses(){
+        MyProcess p;
         for(MyQueue q: queues){
-            for(MyProcess p: q.processes){
+            for(int i=0; i<q.processes.size(); i++){
+                p=q.processes.get(i);
                 if(p.getHasEnded()){
                     finishedProc.add(p);
                     q.removeProcess(p);
                 }
             }
+        }
+    }
+
+    public void increaseWaitingTimes(int t){
+        for(MyQueue q: queues){
+            for(MyProcess p: q.processes) p.setWaitingTime(p.getWaitingTime()+t);
         }
     }
 
@@ -72,13 +57,13 @@ public class CPU {
         return ret;
     }
 
-    private static ArrayList<MyProcess> generateRandomListOfProcesses(int numberOfProcesses){
+    public static ArrayList<MyProcess> generateRandomListOfProcesses(int numberOfProcesses){
         ArrayList<MyProcess> processes=new ArrayList<>();
         for(int i=0; i<numberOfProcesses; i++) processes.add(generateRandomProcess());
         return processes;
     }
 
-    private int countActiveProcesses(){
+    public int countActiveProcesses(){
         int ret=0;
         for(MyQueue q: queues){
             ret=ret+q.processes.size();
@@ -86,22 +71,22 @@ public class CPU {
         return ret;
     }
 
-    public HashMap<String, Double> generateStats(){
-        HashMap<String, Double> statsMap= new HashMap<>();
+    public ArrayList<Stat> generateStats(){
+        ArrayList<Stat> stats=new ArrayList<>();
         int actP=countActiveProcesses();
         int finP= finishedProc.size();
         int allP=actP+finP;
-        statsMap.put("All processes", (double) allP);
-        statsMap.put("Finished processes", (double) finP);
-        statsMap.put("Active processes", (double) actP);
-        statsMap.put("", 0.0);
+        stats.add(new Stat(  allP,"All processes:"));
+        stats.add(new Stat(  finP,"Finished processes:"));
+        stats.add(new Stat(  actP,"Active processes:"));
+        stats.add(new Stat(  0.0,""));
 
         MyQueue tmp;
         for(int i=0; i<queues.size(); i++){
             tmp=queues.get(i);
-            statsMap.put(tmp.name, (double) tmp.processes.size());
+            stats.add(new Stat(tmp.processes.size(), tmp.name));
         }
-        return statsMap;
+        return stats;
     }
 
     public boolean computingEnded(){

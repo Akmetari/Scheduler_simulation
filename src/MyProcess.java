@@ -19,12 +19,11 @@ public class MyProcess {
     public MyProcess(boolean end, int waitT, String name, int[] faze){
         processorFazes=faze;
         this.name=name;
-        waitingTime=waitT;
+        waitingTime=waitT-processDuration();
         hasEnded=end;
         processCPU=new CPU();
         processQueue=new MyQueue("");
     }
-
     public String toString(){
         String fazesStr="";
         for(int i=0; i<processorFazes.length; i++) fazesStr=fazesStr+processorFazes[i]+",";
@@ -53,7 +52,7 @@ public class MyProcess {
         this.hasEnded = hasEnded;
     }
     public void setWaitingTime(int waitingTime) {
-        this.waitingTime = waitingTime;
+        if(!this.hasEnded) this.waitingTime = waitingTime;
     }
     public void setName(String name) {
         this.name = name;
@@ -83,17 +82,45 @@ public class MyProcess {
         for(int i=0; i<3; i++) ret=ret+(rand.nextInt(11));
         return ret;
     }
-    protected static int[] generateProcessorFazes(int b){ // upper boundary of faze time
+    protected static int[] generateProcessorFazes(int b){ // upper boundary of faze time (+1)
         Random rand=new Random();
-        int fazesCount= rand.nextInt(10);
+        int fazesCount= rand.nextInt(10)+1;
         int[] fazes=new int[fazesCount];
 
-        for(int i=0; i<fazesCount; i++)fazes[i]=rand.nextInt(b);
+        for(int i=0; i<fazesCount; i++)fazes[i]=rand.nextInt(b)+1;
         return fazes;
     }
 //***********************************************************************
 
     public void finishProcess(){
         hasEnded=true;
+    }
+
+    private int processDuration(){
+        int ret=0;
+        for(int i=0; i<processorFazes.length; i++) ret=ret+processorFazes[i];
+        return ret;
+    }
+
+    public int assignQuant( int time){
+        int ret=0;
+        int closestNonZero=0;
+        boolean found=false;
+
+        do{
+            if(processorFazes[closestNonZero]!=0) found=true;
+            else closestNonZero++;
+        }while (!found && processorFazes.length>closestNonZero); // searching for next processor faze
+
+        if(!found) hasEnded=true;
+        else {
+            processorFazes[closestNonZero] -= time;
+            if (processorFazes[closestNonZero] < 0) {
+                int tmp = processorFazes[closestNonZero];
+                processorFazes[closestNonZero] = 0;
+                return tmp;
+            }
+        }
+        return 0;
     }
 }

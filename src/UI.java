@@ -1,23 +1,27 @@
-import jdk.nashorn.api.tree.WhileLoopTree;
-
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.*;
 
 public class UI {
-
     JFrame frame;
     JTextArea console;
+    JButton endButton;
+    JButton pauseButton;
+    JButton resumeButton;
 
     public UI(){
         frame=new JFrame();
         console=new JTextArea();
-        frame.getContentPane().add(console);
+
+        frame.getContentPane().add(console, BorderLayout.CENTER);
+        setButtons();
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setBackground(Color.BLACK);
-        frame.setSize(500,500);
+        frame.setSize(700,500);
 
         console.setForeground(Color.WHITE);
         console.setBackground(Color.BLACK);
@@ -25,56 +29,50 @@ public class UI {
         frame.setVisible(true);
     }
 
-    public void runConsole(int tic){
-
-        KeyListener keyListener= new KeyListener() {
+    private void setButtons(){
+        endButton=new JButton("END");
+        pauseButton=new JButton("PAUSE");
+        resumeButton=new JButton("RESUME");
+        JPanel buttons=new JPanel(new GridLayout());
+        frame.getContentPane().add(buttons, BorderLayout.SOUTH);
+        buttons.add(endButton);
+        buttons.add(pauseButton);
+        buttons.add(resumeButton);
+        endButton.addActionListener(new ActionListener() {
             @Override
-            public void keyTyped(KeyEvent keyEvent) {
-
-            }
+            public void actionPerformed(ActionEvent e) {
+                Simulator.stopBasic();
+            }});
+        pauseButton.addActionListener(new ActionListener() {
             @Override
-            public void keyPressed(KeyEvent keyEvent) {
-                if(keyEvent.isAltDown()) Simulator.stopBasic();
-                else {
-                    try {
-                        Thread.sleep(tic*1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+            public void actionPerformed(ActionEvent e) {
+                Simulator.pause=true;
             }
+        });
+        resumeButton.addActionListener(new ActionListener() {
             @Override
-            public void keyReleased(KeyEvent keyEvent) {
-
+            public void actionPerformed(ActionEvent e) {
+                Simulator.pause=false;
             }
-        };
-
-    }
-
-    public void write(String text){
-        console.setText(console.getText()+text);
-    }
-
-    public void clearConsole(){
-        console.setText("");
+        });
     }
 
     public void writeln(String text){
         console.setText(console.getText()+text+"\n");
     }
 
-    private String statToString(String caption, double value){
-        String readyStat=caption+":   ";
-        for(int i=0; i<value; i++) readyStat+="|";
-        return readyStat;
+
+    private String mergeStatsToString(){
+       ArrayList<Stat> stats= Simulator.cpu.generateStats();
+        String merged="SCHEDULER SIMULATION\n";
+        for(int i=0; i<stats.size(); i++){
+            merged=merged+(stats.get(i).statToString())+"\n";
+        }
+        return merged;
     }
 
-    public void writeCPUStats(CPU cpu){
-        HashMap<String, Double> stats= Simulator.cpu.generateStats();
-        for(String s: stats.keySet()){
-            writeln(statToString(s,stats.get(s)));
-        }
-
+    public void writeCPUStats(){
+        console.setText(mergeStatsToString());
     }
 
 }
