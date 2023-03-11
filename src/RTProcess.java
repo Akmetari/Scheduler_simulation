@@ -3,12 +3,12 @@ import java.util.Random;
 public class RTProcess extends MyProcess {
     private int maxWaitingTime;
 
-    public RTProcess(boolean end, int waitT, String name, int[] faze, int maxWaitingTime){
-        super(end, waitT,name,faze);
+    public RTProcess(boolean end, int waitT, String name, int[] faze, int maxWaitingTime,CPU cpu){
+        super(end, waitT,name,faze, cpu);
         this.maxWaitingTime=maxWaitingTime;
     }
-    public RTProcess(){
-        super();
+    public RTProcess(CPU cpu){
+        super(cpu);
     }
     public String toString(){
         String fazesStr="";
@@ -23,8 +23,8 @@ public class RTProcess extends MyProcess {
         this.maxWaitingTime = maxWaitingTime;
     }
 //***************************************************************
-public static RTProcess generateRandomRTProcess(int maxWaitingTimeBoundary){
-    RTProcess ret= new RTProcess();
+public static RTProcess generateRandomRTProcess(int maxWaitingTimeBoundary, CPU cpu){
+    RTProcess ret= new RTProcess(cpu);
     Random rand= new Random();
 
     ret.setName(generateProcessName());
@@ -33,4 +33,6 @@ public static RTProcess generateRandomRTProcess(int maxWaitingTimeBoundary){
     ret.setMaxWaitingTime(rand.nextInt(maxWaitingTimeBoundary));
     return ret;
 }
+
+//TODO checking wiating time. If to big, automaticly jumping to the begining of the queue ??
 }

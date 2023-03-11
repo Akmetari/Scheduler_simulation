@@ -1,6 +1,7 @@
+import java.util.Comparator;
 import java.util.Random;
 
-public class MyProcess {
+public class MyProcess{
     private boolean hasEnded;
     private int waitingTime;
     private String name;
@@ -9,19 +10,20 @@ public class MyProcess {
     private CPU processCPU;
 
 
-    public MyProcess(){
+    public MyProcess(CPU cpu){
         hasEnded=false;
         waitingTime=0;
         name="New process";
         processorFazes=new int[]{1};
+        processCPU=cpu;
     }
 
-    public MyProcess(boolean end, int waitT, String name, int[] faze){
+    public MyProcess(boolean end, int waitT, String name, int[] faze, CPU cpu){
         processorFazes=faze;
         this.name=name;
         waitingTime=waitT-processDuration();
         hasEnded=end;
-        processCPU=new CPU();
+        processCPU=cpu;
         processQueue=new MyQueue("");
     }
     public String toString(){
@@ -67,11 +69,12 @@ public class MyProcess {
         this.processCPU = processCPU;
     }
     //*******************GENERATING PROCESS***********************************
-    public static MyProcess generateRandomMyProcess(){
-        MyProcess ret= new MyProcess();
+    public static MyProcess generateRandomMyProcess(CPU cpu){
+        MyProcess ret= new MyProcess(cpu);
         ret.setName(generateProcessName());
         ret.setHasEnded(false);
         ret.setProcessorFazes(generateProcessorFazes(50));
+        ret.setProcessCPU(cpu);
         return ret;
     }
     protected static String generateProcessName(){
@@ -84,10 +87,10 @@ public class MyProcess {
     }
     protected static int[] generateProcessorFazes(int b){ // upper boundary of faze time (+1)
         Random rand=new Random();
-        int fazesCount= rand.nextInt(10)+1;
+        int fazesCount= rand.nextInt(20)+1;
         int[] fazes=new int[fazesCount];
 
-        for(int i=0; i<fazesCount; i++)fazes[i]=rand.nextInt(b)+1;
+        for(int i=0; i<fazesCount; i++)fazes[i]=rand.nextInt(b)+5;
         return fazes;
     }
 //***********************************************************************
@@ -96,31 +99,34 @@ public class MyProcess {
         hasEnded=true;
     }
 
-    private int processDuration(){
+    public int processDuration(){
         int ret=0;
         for(int i=0; i<processorFazes.length; i++) ret=ret+processorFazes[i];
         return ret;
     }
 
     public int assignQuant( int time){
-        int ret=0;
         int closestNonZero=0;
         boolean found=false;
+        int[] fazes=getProcessorFazes();
 
         do{
-            if(processorFazes[closestNonZero]!=0) found=true;
+            if(fazes[closestNonZero]!=0) found=true;
             else closestNonZero++;
-        }while (!found && processorFazes.length>closestNonZero); // searching for next processor faze
+        }while (!found && fazes.length>closestNonZero); // searching for next processor faze
 
-        if(!found) hasEnded=true;
+        if(!found) setHasEnded(true);
         else {
-            processorFazes[closestNonZero] -= time;
-            if (processorFazes[closestNonZero] < 0) {
-                int tmp = processorFazes[closestNonZero];
-                processorFazes[closestNonZero] = 0;
+                fazes[closestNonZero] -= time;
+            if (fazes[closestNonZero] < 0) {
+                int tmp = fazes[closestNonZero];
+                fazes[closestNonZero] = 0;
                 return tmp;
             }
         }
         return 0;
     }
+
 }
+
+

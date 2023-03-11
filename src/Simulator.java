@@ -14,7 +14,6 @@ public abstract class Simulator {
 //TODO ask for parameters
         switch (simulationType){
             case 0:{
-                scheduler=new FIFOScheduler(5,50);
                 runFIFO(numberOfProcesses);
                 break;
             }
@@ -42,9 +41,11 @@ public abstract class Simulator {
     }
 
     private static void runSJF(boolean isExclusive, int numberOfProcesses) throws InterruptedException {
+        scheduler=new SJFScheduler(5,50, isExclusive);
         runBasic(numberOfProcesses,false);
     }
     private static void runFIFO(int numberOfProcesses) throws InterruptedException {
+        scheduler=new FIFOScheduler(5,50);
         runBasic(numberOfProcesses,false);
     }
     private static void runRR(int numberOfProcesses) throws InterruptedException {
@@ -67,7 +68,7 @@ public abstract class Simulator {
             if(!pause){
                 scheduler.assignProcess();
                 cpu.cleanProcesses();
-                if(scheduler.getWholeTime()%500==0) scheduler.addNewProcesses(rand.nextInt(30));
+                if(scheduler.getWholeTime()%1000==0) scheduler.addNewProcesses(rand.nextInt(30));
                 ui.writeCPUStats();
                 end= cpu.computingEnded();
             }

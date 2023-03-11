@@ -46,9 +46,15 @@ public abstract class Scheduler {
     public abstract CPU prepareCPU(int numberOfProcesses);
     protected void addNewProcesses(int n) {
         int active=cpu.countActiveProcesses();
-        if(active/(cpu.finishedProc.size()+active)<0.3) cpu.assignProcesses(CPU.generateRandomListOfProcesses(n));
+        if(active/(cpu.finishedProc.size()+active)<0.3) {
+            cpu.assignProcesses(cpu.generateRandomListOfProcesses(n));
+            for(int i=0; i<cpu.queues.size(); i++){
+                MyQueue q=cpu.queues.get(i);
+                cpu.queues.set(i,sortQueue(q));
+            }
+        }
     }
-    public abstract void sortQueue();
+    public abstract MyQueue sortQueue(MyQueue q);
 
     public void assignProcess(){
         ArrayList<MyProcess> q=cpu.queues.get(0).processes;

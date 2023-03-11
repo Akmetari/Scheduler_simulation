@@ -9,11 +9,11 @@ public class FIFOScheduler extends Scheduler {
 
     public CPU prepareCPU(int numberOfProcesses){
         cpu.queues.add(new MyQueue("FIFO queue"));
-        cpu.assignProcesses(CPU.generateRandomListOfProcesses(numberOfProcesses));
+        cpu.assignProcesses(cpu.generateRandomListOfProcesses(numberOfProcesses));
         return cpu;
     }
 
     @Override
-    public void sortQueue() {    }
+    public MyQueue sortQueue(MyQueue q) {return q; }
 
 }

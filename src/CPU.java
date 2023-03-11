@@ -45,19 +45,19 @@ public class CPU {
         }
     }
 
-    private static MyProcess generateRandomProcess(){
-        MyProcess ret= new MyProcess();
+    private MyProcess generateRandomProcess(){
+        MyProcess ret;
         Random rand= new Random();
         int n= rand.nextInt();
 
-        if(n%3==0) ret=MyProcess.generateRandomMyProcess();
-        else if(n%3==1) ret=SysProcess.generateRandomSysProcess();
-        else ret=RTProcess.generateRandomRTProcess(50);  // MAX RANDOM RT WAIT TIME CHANGE
+        if(n%3==0) ret=MyProcess.generateRandomMyProcess(this);
+        else if(n%3==1) ret=SysProcess.generateRandomSysProcess(this);
+        else ret=RTProcess.generateRandomRTProcess(50, this);  // MAX RANDOM RT WAIT TIME CHANGE
 
         return ret;
     }
 
-    public static ArrayList<MyProcess> generateRandomListOfProcesses(int numberOfProcesses){
+    public ArrayList<MyProcess> generateRandomListOfProcesses(int numberOfProcesses){
         ArrayList<MyProcess> processes=new ArrayList<>();
         for(int i=0; i<numberOfProcesses; i++) processes.add(generateRandomProcess());
         return processes;

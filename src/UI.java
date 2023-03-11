@@ -21,7 +21,7 @@ public class UI {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setBackground(Color.BLACK);
-        frame.setSize(700,500);
+        frame.setSize(1000,500);
 
         console.setForeground(Color.WHITE);
         console.setBackground(Color.BLACK);
@@ -64,7 +64,7 @@ public class UI {
 
     private String mergeStatsToString(){
        ArrayList<Stat> stats= Simulator.cpu.generateStats();
-        String merged="SCHEDULER SIMULATION\n";
+        String merged="SCHEDULER SIMULATION\n\n";
         for(int i=0; i<stats.size(); i++){
             merged=merged+(stats.get(i).statToString())+"\n";
         }
