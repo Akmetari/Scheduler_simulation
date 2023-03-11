@@ -1,14 +1,13 @@
-import java.util.ArrayList;
 import java.util.Collections;
 
 public class SJFScheduler extends Scheduler{
-    boolean exclusive;
-    public SJFScheduler( int q, int oldeningTime, boolean isExclusive){
+    boolean expropriating;
+    public SJFScheduler( int q, int oldeningTime, boolean isExpropriating){
         cpu= new CPU();
         timeQuant=q;
         this.oldeningTime=oldeningTime;
         averageWaitingTime=0;
-        exclusive=isExclusive;
+        expropriating=isExpropriating;
     }
 
 
@@ -25,4 +24,6 @@ public class SJFScheduler extends Scheduler{
         Collections.sort(q.processes,new MyProcessComparator());
         return q;
     }
+
+
 }

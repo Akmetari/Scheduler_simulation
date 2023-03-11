@@ -6,6 +6,7 @@ public abstract class Simulator {
     static int tic;
     static UI ui;
     static boolean pause=false;
+    static boolean end=false;
 
 
     public static void runSimulation(int simulationType, int numberOfProcesses, int t)throws InterruptedException{  // tic - co ile kwantow czasu ma sie odswieżayc widok
@@ -16,32 +17,32 @@ public abstract class Simulator {
             case 0:{
                 runFIFO(numberOfProcesses);
                 break;
-            }
+            } //FIFO
             case 1:{
                 runSJF(false,numberOfProcesses);
                 break;
-            }
+            } //SJF
             case 2:{
                 runSJF(true,numberOfProcesses);
                 break;
-            }
+            } //SJF expropriating
             case 3:{
                 runRR(numberOfProcesses);
                 break;
-            }
+            } //RR
             case 4:{
                 runMix(numberOfProcesses);
                 break;
-            }
+            } //mix
             case 5:{
                 runCustom(numberOfProcesses);
                 break;
-            }
+            } //custom
         }
     }
 
-    private static void runSJF(boolean isExclusive, int numberOfProcesses) throws InterruptedException {
-        scheduler=new SJFScheduler(5,50, isExclusive);
+    private static void runSJF(boolean isExpropriating, int numberOfProcesses) throws InterruptedException {
+        scheduler=new SJFScheduler(5,50, isExpropriating);
         runBasic(numberOfProcesses,false);
     }
     private static void runFIFO(int numberOfProcesses) throws InterruptedException {
@@ -61,16 +62,15 @@ public abstract class Simulator {
 
     private static void runBasic(int numberOfProcesses, boolean arch) throws InterruptedException {
         Random rand=new Random();
-        boolean end=false;
         cpu=scheduler.prepareCPU(numberOfProcesses);
         ui.writeCPUStats();
         do{
             if(!pause){
                 scheduler.assignProcess();
-                cpu.cleanProcesses();
+                scheduler.tideUp();
                 if(scheduler.getWholeTime()%1000==0) scheduler.addNewProcesses(rand.nextInt(30));
                 ui.writeCPUStats();
-                end= cpu.computingEnded();
+                if(end!=true)end= cpu.computingEnded();
             }
         }while(!end );
         stopBasic();
@@ -78,6 +78,7 @@ public abstract class Simulator {
 
     public static void stopBasic(){
         ui.writeln("End of the simulation");
+        end=true;
     }
 
 

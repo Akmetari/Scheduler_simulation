@@ -48,10 +48,7 @@ public abstract class Scheduler {
         int active=cpu.countActiveProcesses();
         if(active/(cpu.finishedProc.size()+active)<0.3) {
             cpu.assignProcesses(cpu.generateRandomListOfProcesses(n));
-            for(int i=0; i<cpu.queues.size(); i++){
-                MyQueue q=cpu.queues.get(i);
-                cpu.queues.set(i,sortQueue(q));
-            }
+
         }
     }
     public abstract MyQueue sortQueue(MyQueue q);
@@ -62,6 +59,14 @@ public abstract class Scheduler {
             int spareTime= q.get(0).assignQuant(timeQuant);
             cpu.increaseWaitingTimes(timeQuant-spareTime);
             wholeTime+=timeQuant-spareTime;
+        }
+    }
+
+    public void tideUp() {
+        cpu.cleanProcesses();
+        for(int i=0; i<cpu.queues.size(); i++){
+            MyQueue q=cpu.queues.get(i);
+            cpu.queues.set(i,sortQueue(q));
         }
     }
 

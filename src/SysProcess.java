@@ -61,6 +61,8 @@ public class SysProcess extends MyProcess{ // moze tworzyc inne procesy
             if((rand.nextInt()%100==0)){  // creating child processes while running processor faze
                 createChildProcess();
                 fazes[closestNonZero] -= Math.round(time/2);
+                int spareTime=getProcessCPU().queues.get(0).processes.get(0).assignQuant(time);
+                getProcessCPU().increaseWaitingTimes(time-spareTime);
             }else fazes[closestNonZero] -= time;
 
             if (fazes[closestNonZero] < 0) {
